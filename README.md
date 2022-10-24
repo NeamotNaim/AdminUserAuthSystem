@@ -1,67 +1,230 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+all about auth    https://laravel.com/docs/9.x/authentication
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+1. install laravel project 
+2. install authentication system   link:https://laravel.com/docs/9.x/authentication 
+        first connnect database
+        a. composer require laravel/breeze --dev
+        b.php artisan breeze:install
+ 
+        c.php artisan migrate
+        d.npm install
+        e.npm run dev
+3. edit everythig for user login system from default login provided by laravel
+4. now create admin login system 
+	  1.make everything like default authentication system 
+	  2.create database and model       php artisan make:model User -m   copy everythig from user.php to admin.php replace User by Admin
+										 and change necessary field for  create_user_table to admins_user_table 
+	  3. make seeders and tinker if you want
+	  4. make controller  admin       php artisan make:controller Admin/AdminController
+	  5. make route for admin in web.php   
 
-## About Laravel
+     //admin route
+5. Route::namespace('Admin')->prefix('admin')-name('admin')-group(function(){
+              //login route
+                Route::namespace('Auth')->group(function(){
+           });
+       });
+6. app/Providers/RouteServiceProvider.php uncomment protected namespace 'app/http/controllers'.
+        if it hasn't any add this
+        protected $namespace = 'App\\Http\\Controllers'; after     public const HOME = '/dashboard';   //it just for not to use app/http/controller in page where               ituses
+        and boot function like as
+                        $this->routes(function () {
+                     Route::prefix('api')
+                      ->middleware('api')
+                      ->namespace($this->namespace)
+                      ->group(base_path('routes/api.php'));
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+                     Route::middleware('web')
+                      ->namespace($this->namespace)
+                      ->group(base_path('routes/web.php'));
+                    });
+       if it problem then use the full path of every controller in use section 
+7. app/http/controllers/auth/AuthenticatedSessionController.php copy this to      app/http/controllers/Admin/Auth/AuthenticatedSessionController.php
+   change as 
+   <?php
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+   namespace App\Http\Controllers\Admin\Auth;  //0. here folder structure change
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+   use App\Http\Controllers\Controller;
+   use App\Http\Requests\Auth\LoginRequest;
+   use App\Providers\RouteServiceProvider;
+   use Illuminate\Http\Request;
+   use Illuminate\Support\Facades\Auth;
 
-## Learning Laravel
+	   class AuthenticatedSessionController extends Controller
+	   {
+		/**
+		 * Display the login view.
+		 *
+		 * @return \Illuminate\View\View
+		 */
+		public function create()
+		{
+			return view('admin.auth.login');  //1. here it goes before auth.login
+		}
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+		/**
+		 * Handle an incoming authentication request.
+		 *
+		 * @param  \App\Http\Requests\Auth\LoginRequest  $request
+		 * @return \Illuminate\Http\RedirectResponse
+		 */
+		public function store(LoginRequest $request)
+		{
+			$request->authenticate();
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+			$request->session()->regenerate();
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+			return redirect()->intended(RouteServiceProvider::ADMIN_HOME);  //2.here it goes before HOME 
+				 // 3. also change the serviceproviders as   public const ADMIN_HOME = '/admin/dashboard';  // after public const HOME = '/dashboard';
 
-## Laravel Sponsors
+		/**
+		 * Destroy an authenticated session.
+		 *
+		 * @param  \Illuminate\Http\Request  $request
+		 * @return \Illuminate\Http\RedirectResponse
+		 */
+		public function destroy(Request $request)
+		{
+			Auth::guard('web')->logout();
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+			$request->session()->invalidate();
 
-### Premium Partners
+			$request->session()->regenerateToken();
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+			return redirect('/');
+		}
+	   }
 
-## Contributing
+8.  make view for admin             copy     view/auth/login.blade.php    to                  view/admin/auth/login.blade.php 
+                                           change in page to understand it is login page like  Admin Login by change the logo
+9.  now make login route for admin by changing the login group route 
+	   namespace App\Http\Controllers\Admin\Auth;
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+	   Route::namespace('Admin')->prefix('admin')->name('admin.')->group(function(){
+				  //login route
+			 Route::namespace('Auth')->group(function(){
+				  Route::get('login',[AuthenticatedSessionController::class, 'create'])->name('login');      
+			   });       
+		 });
+10. now create post method for admin login by this , also change the route on admin login view page to adminlogin
 
-## Code of Conduct
+	   Route::namespace('Admin')->prefix('admin')->name('admin.')->group(function(){
+				  //login route
+			 Route::namespace('Auth')->group(function(){
+				  Route::get('login',[AuthenticatedSessionController::class, 'create'])->name('login');      
+				  Route::post('login',[AuthenticatedSessionController::class, 'store'])->name('adminlogin');      //here it is
+			   });       
+		 });
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+11. make seeders for admin      
+		a. php artisan make:seed AdminSeeder
+		b. edit AdminSeeder as $admin=[
+				'name'=>'Admin',
 
-## Security Vulnerabilities
+				'email'=>'admin@gmail.com',
+				'password'=>bcrypt('password')//password=password
+			];
+			Admin::create($admin);
+		c. add this to DatabaseSeeder file                                   $this->call(AdminSeeder::class); 
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+12. making guard for Admin model 
+                     declare this in Admin
+			protected $guard ='admin'; after use HasApiTokens, HasFactory, Notifiable;
 
-## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# AdminUserAuthSystem
+			config/auth.php 
+						   'guards' => [
+				'web' => [
+					'driver' => 'session',
+					'provider' => 'users',
+				],
+				'admin' => [
+					'driver' => 'session',
+					'provider' => 'admins',
+				],
+			],
+		   and 
+		  'providers' => [
+				'users' => [
+					'driver' => 'eloquent',
+					'model' => App\Models\User::class,
+				],
+				'admins' => [
+					'driver' => 'eloquent',
+					'model' => App\Models\Admin::class,
+				],
+
+13. edit middleware/RedirectIfAuthenticated 
+
+
+       if (Auth::guard($guard)->check()) {
+                if($guard=='admin'){
+                     return redirect(RouteServiceProvider::ADMIN_HOME);
+                }
+                return redirect(RouteServiceProvider::HOME);
+            }
+14. check that the admin.adminlogin route working by giving data .   dd($request->all()); in store function of admin/auth/authticatedSessionController
+15. now make AdminLoginRequest 
+        change App\Http\Controllers\Admin\Auth\AuthenticatedSessionController as
+        a. use App\Http\Requests\Auth\AdminLoginRequest; instead of use App\Http\Requests\Auth\LoginRequest; 
+        b.    public function store(AdminLoginRequest $request) instead of     public function store(LoginRequest $request)
+        c. now make App\Http\Requests\Auth\AdminLoginRequest by copy all from LoginRequest and change the name class AdminLoginRequest extends FormRequest instead of class LoginRequest extends FormRequest
+        d. change  if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) { 
+           instead of  if (! Auth::guard('admin')->attempt($this->only('email', 'password'), $this->boolean('remember'))) { // 2.guard('admin')-> it goes also
+        e. try to login you will get 404 NOT FOUND at admin/dashboard // if everything is currect
+
+16. create everything for dashboard 
+         a. create view in view/admin/dashboard by copy everything from dashboard and write Admin Dashboard to understand it's dashboard
+         b.create route for this as 
+                   Route::namespace('Admin')->prefix('admin')->name('admin.')->group(function(){
+                       //login route
+                    Route::namespace('Auth')->group(function(){
+                     Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');      
+                     Route::post('login',[AuthenticatedSessionController::class, 'store'])->name('adminlogin');    
+                       });
+                     Route::get('dashboard',[HomeController::class,'index']);       
+                   });
+          C. make index function in homecontroller as
+                       public function index(){
+                            return view('admin.dashboard');
+        
+                        }
+           d.but the dashboard is for the user so change it layout and structure for admin dashboard 
+
+                       1.copy layouts folder from view to admin 
+                       2. make component for admin by copy app/view/component/applayout to app/view/component/AdminLayout and chane applayout to AdminLayout to name
+                             like class AdminLayout extends Component, return view('admin.layouts.app');
+                       3. change admin/layouts/app so that it got AdminLayout
+                       4. change  @include('admin.layouts.navigation'), all route(dashboard) to route(admin.dashboard)
+                       5. make sure that admin dashboard has <x-admin-layout>
+            e. now condition for login , register, dashboard interface 
+                           @auth('admin')
+                    <a href="{{route('admin.dashboard')}}">Admin Dashboard</a>
+                    @else
+                      <a href="{{route('admin.login')}}">Admin Login</a>
+                    @endauth
+17. now make the logout for admin define route :   Route::post('logout',[AuthenticatedSessionController::class, 'destroy'])->name('logout');  change in destroy method
+                                                   as   Auth::guard('admin')->logout();
+                                                   use admin.logout() everywhere there route(logout()) in navigation
+
+18. now protect admin.dashboard by midddleware 
+              a. make middleware as php artisan make:middleware AdminMiddleware
+              b. conditioned as in middleware 
+                                       public function handle(Request $request, Closure $next)
+                                            {
+                                          if(!Auth::guard('admin')->check()){
+                                         return redirect()->route('admin.login');
+                                           }
+            
+        
+                                            return $next($request);
+                                          }
+             c. apply middleware and group the route  Route::middleware('admin')->group(function(){
+             d. register the middleware in kernel.php       protected $routeMiddleware = [  'admin' => \App\Http\Middleware\AdminMiddleware::class,
+
+19. now after login admin can go login route again to prevent it apply middleware guest in all admin/auth route  
+                                  Route::middleware('guest:admin')->namespace('Auth')->group(function(){ //   Route::middleware('guest:admin')->
+              Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');      
+              Route::post('login',[AuthenticatedSessionController::class, 'store'])->name('adminlogin');    
+           });
