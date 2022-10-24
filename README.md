@@ -1,4 +1,3 @@
-video tutorial:   https://www.youtube.com/watch?v=UWniysfpTmM
 all about auth    https://laravel.com/docs/9.x/authentication
 
 1. install laravel project 
