@@ -27,7 +27,7 @@ require __DIR__.'/auth.php';
 //admin route
 Route::namespace('Admin')->prefix('admin')->name('admin.')->group(function(){
               //login route
-         Route::namespace('Auth')->group(function(){
+         Route::namespace('Auth')->middleware('guest:admin')->group(function(){
               Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');      
               Route::post('login',[AuthenticatedSessionController::class, 'store'])->name('adminlogin');    
            });

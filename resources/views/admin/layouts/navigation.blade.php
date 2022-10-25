@@ -5,6 +5,7 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
+                    <!-- 1.change goes here  -->
                     <a href="{{ route('admin.dashboard') }}">
                         <x-application-logo class="block h-10 w-auto fill-current text-gray-600" />
                     </a>
@@ -12,6 +13,7 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                    <!-- 2.change goes here  -->
                     <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                         {{ __('Admin Dashboard') }}
                     </x-nav-link>
@@ -23,6 +25,7 @@
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
+                            <!-- 3.change goes here  -->
                             <div>{{ Auth::guard('admin')->user()->name }}</div>
 
                             <div class="ml-1">
@@ -35,6 +38,7 @@
 
                     <x-slot name="content">
                         <!-- Authentication -->
+                        <!-- 4.change goes here -->
                         <form method="POST" action="{{ route('admin.logout') }}">
                             @csrf
 
@@ -71,12 +75,14 @@
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="px-4">
+                <!-- 5.change goes here -->
                 <div class="font-medium text-base text-gray-800">{{ Auth::guard('admin')->user()->name }}</div>
                 <div class="font-medium text-sm text-gray-500">{{ Auth::guard('admin')->user()->email }}</div>
             </div>
 
             <div class="mt-3 space-y-1">
                 <!-- Authentication -->
+                <!-- 6.change goes here  -->
                 <form method="POST" action="{{ route('admin.logout') }}">
                     @csrf
 

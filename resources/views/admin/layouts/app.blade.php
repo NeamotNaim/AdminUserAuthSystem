@@ -15,7 +15,8 @@
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
-            @include('admin.layouts.navigation')
+            <!-- 1. here goes the change  -->
+            @include('admin.layouts.navigation')  
 
             <!-- Page Heading -->
             @if (isset($header))
